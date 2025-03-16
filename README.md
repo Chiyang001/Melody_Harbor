@@ -326,7 +326,7 @@ python app.py
 
 ### 1. 下载并安装 ngrok
 - 访问 [ngrok 官方网站](https://ngrok.com/) 注册账号。
-- 下载适合你操作系统的 ngrok 客户端解压下载的文件到一个目录，例如 `C:\ngrok`（Windows Powershell该步骤可跳过，直接执行第三条命令亦可自动安装ngrok并配置文件）。
+- 下载适合你操作系统的 ngrok 客户端解压下载的文件到一个目录，例如 `C:\ngrok`（Windows Powershell该步骤可跳过，直接执行第二条命令亦可自动安装ngrok并配置文件）。
 
 ### 2. 配置 ngrok
 - 打开终端，进入 ngrok 所在的目录，例如：
@@ -335,7 +335,7 @@ cd C:\ngrok
 ```
 - 使用你的 ngrok 账号的认证令牌进行配置，命令如下：
 ```bash
-ngrok authtoken your_auth_token
+ngrok config add-authtoken YOUR_AUTH_TOKEN
 ```
 其中 `your_auth_token` 是你在 ngrok 官网获取的认证令牌。
 
