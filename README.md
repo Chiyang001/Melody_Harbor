@@ -325,8 +325,8 @@ python app.py
 ## 六、ngrok 内网穿透方法
 
 ### 1. 下载并安装 ngrok
-- 访问 [ngrok 官方网站](https://ngrok.com/) 注册账号并下载适合你操作系统的 ngrok 客户端。
-- 解压下载的文件到一个目录，例如 `C:\ngrok`。
+- 访问 [ngrok 官方网站](https://ngrok.com/) 注册账号。
+- 下载适合你操作系统的 ngrok 客户端解压下载的文件到一个目录，例如 `C:\ngrok`（Windows Powershell该步骤可跳过，直接执行第三条命令亦可自动安装ngrok并配置文件）。
 
 ### 2. 配置 ngrok
 - 打开终端，进入 ngrok 所在的目录，例如：
