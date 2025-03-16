@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>旋律港湾 - Melody Harbor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #0056b3;
+            padding: 20px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 30px;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #f0f0f0;
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        li {
+            background-color: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        li:hover {
+            transform: scale(1.03);
+        }
+
+        .music-info {
+            flex: 1;
+            margin-left: 30px;
+        }
+
+        .music-cover {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .like-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 30px;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+        }
+
+        .like-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .share-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 30px;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+        }
+
+        .share-btn:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 30px;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>旋律港湾 - Melody Harbor</h1>
+    </header>
+    <nav>
+        <a href="/logout">注销</a>
+        <a href="/upload">上传音乐</a>
+    </nav>
+    <main>
+        <h2>可用音乐</h2>
+        <ul>
+            {% for music in music_list %}
+            <li>
+                <img class="music-cover"
+                    src="{{ url_for('static', filename='music_covers/' + music.cover_filename) if music.cover_filename else url_for('static', filename='default_cover.jpg') }}"
+                    alt="Music Cover">
+                <div class="music-info">
+                    <h3>{{ music.title }} - {{ music.artist }}</h3>
+                    <p>由 {{ music.username }} 上传</p>
+                    {% if music.lyrics %}
+                    <p>歌词: {{ music.lyrics }}</p>
+                    {% endif %}
+                    <audio controls>
+                        <source src="{{ url_for('static', filename='music/' + music.filename) }}" type="audio/mpeg">
+                        您的浏览器不支持音频播放。
+                    </audio>
+                    <button class="like-btn" onclick="likeMusic('{{ music.filename }}')">点赞 ({{ music.likes }})</button>
+                    <button class="share-btn" onclick="shareMusic('{{ url_for('static', filename='music/' + music.filename) }}')">分享</button>
+                    {% if music.username == session.username %}
+                    <button class="delete-btn" onclick="deleteMusic('{{ music.filename }}')">删除</button>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </main>
+    <script>
+        function likeMusic(filename) {
+            window.location.href = `/like_music/${filename}`;
+        }
+
+        function shareMusic(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('音乐链接已复制到剪贴板！');
+            }).catch((err) => {
+                alert('复制链接失败: ' + err);
+            });
+        }
+
+        function deleteMusic(filename) {
+            if (confirm('确定要删除这首音乐吗？')) {
+                window.location.href = `/delete_music/${filename}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
