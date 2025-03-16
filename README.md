@@ -1,47 +1,171 @@
-# 旋律港湾 - 音乐分享平台项目文档 🎵
+# 旋律港湾 - 音乐分享平台项目文档
 
 ## 一、项目概述
-想象一下，你身处一个名为“旋律港湾”的神奇音乐世界 🌊。在这里，你就像一位音乐探险家，能够注册、登录，开启属于自己的音乐之旅。你可以上传自己喜爱的音乐，就像是在港湾里停靠一艘艘装满美妙旋律的船只；还能对音乐进行点赞，仿佛是为这些船只升起一面面赞许的旗帜；要是你上传的音乐，你还能随时将它“驶离”港湾，也就是删除它。这个平台基于 Flask 框架构建，就像为这个音乐世界搭建了一个坚固的码头，使用简单的 JSON 文件存储用户和音乐信息，如同在码头边的仓库里记录着每一艘船的信息。同时，借助 Pillow 库处理音乐封面图片，让每艘船都有一张精美的“照片”。
+“旋律港湾 - 音乐分享平台” 是一个基于 Flask 框架开发的 Web 应用程序，用户可以在该平台上注册、登录、上传音乐、删除自己上传的音乐、点赞音乐等😎。该项目通过将用户信息和音乐信息存储在本地文件系统中，实现了基本的音乐分享功能。
 
-[点击查看项目代码仓库](此处可替换为实际仓库链接)
-
-## 二、项目结构 📁
-下面是项目的结构思维导图，让你更清晰地了解各个文件和文件夹的关系：
-```mermaid
-graph LR
-    classDef startend fill:#F5EBFF,stroke:#BE8FED,stroke-width:2px;
-    classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
-
-    A([Melody_Harbor]):::startend --> B(app.py):::process
-    A --> C(requirements.txt):::process
-    A --> D(Dockerfile):::process
-    A --> E(user_manager.py):::process
-    A --> F(music_manager.py):::process
-    A --> G(templates/):::process
-    G --> H(index.html):::process
-    G --> I(login.html):::process
-    G --> J(register.html):::process
-    G --> K(upload.html):::process
+## 二、项目结构
+```plaintext
+Melody_Harbor/
+│
+├── app.py                # 主应用程序文件
+├── user_manager.py       # 用户管理模块
+├── music_manager.py      # 音乐管理模块
+│
+├── templates/            # HTML 模板文件
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── upload.html
+│
+├── static/               # 静态文件目录
+│   ├── music/            # 音乐文件存储目录
+│   ├── music_covers/     # 音乐封面文件存储目录
 ```
 
-### 文件说明
-| 文件/文件夹 | 功能描述 |
+### 项目结构思维导图
+```mermaid
+graph TD;
+    Melody_Harbor --> app.py;
+    Melody_Harbor --> user_manager.py;
+    Melody_Harbor --> music_manager.py;
+    Melody_Harbor --> templates;
+    Melody_Harbor --> static;
+    templates --> index.html;
+    templates --> login.html;
+    templates --> register.html;
+    templates --> upload.html;
+    static --> music;
+    static --> music_covers;
+```
+
+## 三、功能模块
+
+### 功能模块表格
+| 功能模块 | 功能描述 |
 | ---- | ---- |
-| `app.py` | Flask 应用的主文件，就像音乐世界的总指挥，定义了各个路由和视图函数，指挥着音乐的流动和展示。 |
-| `requirements.txt` | 项目依赖的 Python 包列表，包含 Flask 和 Pillow，就像是建造码头所需的各种材料清单。 |
-| `Dockerfile` | 用于容器化部署的配置文件，如同为码头准备了一艘可以远航的大船，方便项目的部署和迁移。 |
-| `user_manager.py` | 负责用户的注册和登录功能，将用户信息存储在 `users` 目录下的 JSON 文件中，好比是码头的安检处，管理着每个进入港湾的人的身份信息。 |
-| `music_manager.py` | 处理音乐的上传、获取、删除和点赞操作，音乐信息和封面图片分别存储在 `static/music` 和 `static/music_covers` 目录下，是港湾里的码头管理员，管理着每一艘音乐船只的停靠、离开和受欢迎程度。 |
-| `templates/` | 存放 HTML 模板文件，用于渲染不同的页面，就像是码头的各个区域，每个区域都有特定的功能和布局。 |
+| 用户管理 | 包含注册、登录、注销功能。注册时检查用户名是否已存在；登录时验证用户名和密码；注销时清除会话信息。 |
+| 音乐管理 | 支持上传、删除和点赞音乐。上传时检查文件格式；删除时仅允许用户删除自己上传的音乐；点赞时更新音乐的点赞数。 |
+| 音乐展示 | 已登录用户可在首页看到所有音乐列表，包括音乐封面、标题、艺术家等信息，还可进行播放、点赞、分享和删除操作。 |
 
-## 三、功能模块 🎛️
+### 功能模块详细介绍
 
-### 用户管理
-#### 注册 📝
-用户可以在注册页面输入用户名和密码进行注册，就像在港湾里登记自己的身份信息。若用户名已存在，注册失败，仿佛这个位置已经被其他船只占据；否则，将用户信息保存为 JSON 文件，就像给你的船只发放了一张专属的通行证。
+#### 1. 用户管理
+- **注册**：用户可以输入用户名和密码进行注册，系统会检查用户名是否已存在，若不存在则将用户信息保存到本地文件中👍。
+- **登录**：用户输入用户名和密码进行登录，系统会验证用户名和密码的正确性，若正确则将用户信息保存到会话中。
+- **注销**：用户可以点击注销按钮，系统会清除会话中的用户信息，并将用户重定向到登录页面。
+
+#### 2. 音乐管理
+- **上传**：已登录用户可以上传音乐文件、音乐封面和填写音乐标题、艺术家、歌词等信息，系统会检查文件格式是否允许，若允许则将音乐文件和相关信息保存到本地文件中。
+- **删除**：已登录用户可以删除自己上传的音乐，系统会删除音乐文件、音乐封面文件和相关信息文件。
+- **点赞**：已登录用户可以对音乐进行点赞，系统会更新音乐信息中的点赞数。
+
+#### 3. 音乐展示
+- **首页**：已登录用户可以在首页看到所有音乐的列表，包括音乐封面、标题、艺术家、上传者、歌词、音频播放器、点赞按钮、分享按钮和删除按钮（仅自己上传的音乐可见）。
+
+## 四、代码实现
+
+### 1. `app.py`
 ```python
-# user_manager.py
+# 音乐分享平台/app.py
+from flask import Flask, render_template, request, redirect, session
+from user_manager import register_user, login_user
+from music_manager import upload_music, get_all_music_info, delete_music, like_music
+
+app = Flask(__name__)
+app.secret_key = "your_secret_key"
+
+@app.route("/")
+def index():
+    if "username" not in session:
+        return redirect("/login")
+    music_list = get_all_music_info()
+    return render_template("index.html", music_list=music_list)
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if register_user(username, password):
+            return redirect("/login")
+        else:
+            return "用户名已存在。"
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if login_user(username, password):
+            session["username"] = username
+            return redirect("/")
+        else:
+            return "用户名或密码无效。"
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return redirect("/login")
+
+@app.route("/upload", methods=["GET", "POST"])
+def upload():
+    if "username" not in session:
+        return redirect("/login")
+    if request.method == "POST":
+        file = request.files["file"]
+        title = request.form.get("title")
+        artist = request.form.get("artist")
+        lyrics = request.form.get("lyrics")
+        cover_file = request.files.get("cover")
+        username = session["username"]
+        if upload_music(file, title, artist, username, lyrics, cover_file):
+            return redirect("/")
+        else:
+            return "上传失败，请检查文件格式。"
+    return render_template("upload.html")
+
+@app.route("/delete_music/<filename>")
+def delete(filename):
+    if "username" not in session:
+        return redirect("/login")
+    username = session["username"]
+    if delete_music(filename, username):
+        return redirect("/")
+    else:
+        return "删除失败。"
+
+@app.route("/like_music/<filename>")
+def like(filename):
+    if "username" not in session:
+        return redirect("/login")
+    if like_music(filename):
+        return redirect("/")
+    else:
+        return "点赞失败。"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+### 2. `user_manager.py`
+```python
+import os
+import json
+
+# 用户数据存储路径
+USER_DATA_DIR = r"D:\Website_Data\users"
+if not os.path.exists(USER_DATA_DIR):
+    os.makedirs(USER_DATA_DIR)
+
 def register_user(username, password):
+    """
+    注册新用户
+    :param username: 用户名
+    :param password: 密码
+    :return: 注册成功返回True，失败返回False
+    """
     user_file = os.path.join(USER_DATA_DIR, f"{username}.json")
     if os.path.exists(user_file):
         return False
@@ -49,68 +173,74 @@ def register_user(username, password):
         "username": username,
         "password": password
     }
-    try:
-        with open(user_file, "w") as f:
-            json.dump(user_data, f)
-        return True
-    except PermissionError:
-        print(f"没有足够的权限写入用户文件 {user_file}。请检查运行环境的权限设置。")
-        return False
-```
+    with open(user_file, "w") as f:
+        json.dump(user_data, f)
+    return True
 
-#### 登录 🔑
-用户在登录页面输入用户名和密码，系统会验证用户信息。若验证通过，将用户名存储在会话中，并重定向到首页，就像你拿着通行证顺利进入港湾，开启音乐之旅；否则，提示用户名或密码无效，仿佛你的通行证是假的，无法进入。
-```python
-# user_manager.py
 def login_user(username, password):
+    """
+    用户登录
+    :param username: 用户名
+    :param password: 密码
+    :return: 登录成功返回True，失败返回False
+    """
     user_file = os.path.join(USER_DATA_DIR, f"{username}.json")
     if not os.path.exists(user_file):
         return False
-    try:
-        with open(user_file, "r") as f:
-            user_data = json.load(f)
-        return user_data["password"] == password
-    except PermissionError:
-        print(f"没有足够的权限读取用户文件 {user_file}。请检查运行环境的权限设置。")
-        return False
+    with open(user_file, "r") as f:
+        user_data = json.load(f)
+    return user_data["password"] == password
 ```
 
-#### 注销 🚪
-用户点击注销按钮后，会话中的用户名会被移除，并重定向到登录页面，就像你结束了这次音乐之旅，离开了港湾。
+### 3. `music_manager.py`
 ```python
-# app.py
-@app.route("/logout")
-def logout():
-    session.pop("username", None)
-    return redirect("/login")
-```
+import os
+import json
+from PIL import Image
 
-### 音乐管理
-#### 上传 🎵
-已登录用户可以在上传页面选择音乐文件、填写音乐信息（标题、艺术家、歌词）和封面图片进行上传。上传成功后，音乐文件、封面图片和音乐信息会分别保存到相应目录，并返回首页，就像你成功地将一艘装满美妙旋律的船只停靠在了港湾；否则，提示上传失败，仿佛船只在停靠时遇到了阻碍。
-```python
-# music_manager.py
+# 音乐数据存储路径，确保这些路径是 static 目录的子目录
+MUSIC_DATA_DIR = r"static/music"
+COVER_DATA_DIR = r"static/music_covers"
+if not os.path.exists(MUSIC_DATA_DIR):
+    os.makedirs(MUSIC_DATA_DIR)
+if not os.path.exists(COVER_DATA_DIR):
+    os.makedirs(COVER_DATA_DIR)
+
+ALLOWED_MUSIC_EXTENSIONS = {'mp3', 'wav', 'ogg', 'flac'}
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename, allowed_extensions):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
 def upload_music(file, title, artist, username, lyrics=None, cover_file=None):
+    """
+    上传音乐文件并保存相关信息
+    :param file: 音乐文件对象
+    :param title: 音乐标题
+    :param artist: 音乐艺术家
+    :param username: 上传者用户名
+    :param lyrics: 音乐歌词
+    :param cover_file: 音乐封面文件对象
+    :return: 上传成功返回True，失败返回False
+    """
     if not allowed_file(file.filename, ALLOWED_MUSIC_EXTENSIONS):
         return False
     try:
-        # 保存音乐文件
         music_filename = f"{title}_{artist}.{file.filename.rsplit('.', 1)[1].lower()}"
         music_path = os.path.join(MUSIC_DATA_DIR, music_filename)
         file.save(music_path)
 
-        # 处理封面图片
         cover_filename = None
         if cover_file:
             if allowed_file(cover_file.filename, ALLOWED_IMAGE_EXTENSIONS):
                 cover_filename = f"{title}_{artist}.{cover_file.filename.rsplit('.', 1)[1].lower()}"
                 cover_path = os.path.join(COVER_DATA_DIR, cover_filename)
                 cover_file.save(cover_path)
+                # 裁剪图片到合适大小
                 with Image.open(cover_path) as img:
                     img.thumbnail((100, 100))
                     img.save(cover_path)
 
-        # 保存音乐信息
         music_info = {
             "title": title,
             "artist": artist,
@@ -125,99 +255,99 @@ def upload_music(file, title, artist, username, lyrics=None, cover_file=None):
         with open(info_path, "w") as f:
             json.dump(music_info, f)
         return True
-    except PermissionError:
-        print("没有足够的权限上传音乐或保存相关信息。请检查运行环境的权限设置。")
-        return False
     except Exception as e:
         print(f"Upload error: {e}")
         return False
-```
 
-#### 获取所有音乐信息 🎧
-系统会读取 `static/music` 目录下的所有 JSON 文件，将音乐信息存储在列表中并返回，就像港湾管理员将所有船只的信息整理出来供你查看。
-```python
-# music_manager.py
 def get_all_music_info():
+    """
+    获取所有音乐的信息
+    :return: 包含所有音乐信息的列表
+    """
     music_info_list = []
-    try:
-        for filename in os.listdir(MUSIC_DATA_DIR):
-            if filename.endswith(".json"):
-                info_path = os.path.join(MUSIC_DATA_DIR, filename)
-                with open(info_path, "r") as f:
-                    music_info = json.load(f)
-                    music_info_list.append(music_info)
-        return music_info_list
-    except PermissionError:
-        print("没有足够的权限读取音乐信息。请检查运行环境的权限设置。")
-        return []
-```
+    for filename in os.listdir(MUSIC_DATA_DIR):
+        if filename.endswith(".json"):
+            info_path = os.path.join(MUSIC_DATA_DIR, filename)
+            with open(info_path, "r") as f:
+                music_info = json.load(f)
+                music_info_list.append(music_info)
+    return music_info_list
 
-#### 删除音乐 🗑️
-已登录用户可以删除自己上传的音乐。系统会先检查音乐信息文件是否存在，若存在且用户名匹配，则删除音乐文件、封面图片和音乐信息文件，就像你将自己停靠在港湾的船只开走了。
-```python
-# music_manager.py
 def delete_music(filename, username):
+    """
+    删除指定用户上传的音乐
+    :param filename: 音乐文件名
+    :param username: 用户名
+    :return: 删除成功返回True，失败返回False
+    """
     info_filename = filename.rsplit('.', 1)[0] + '.json'
     info_path = os.path.join(MUSIC_DATA_DIR, info_filename)
     if os.path.exists(info_path):
-        try:
-            with open(info_path, "r") as f:
-                music_info = json.load(f)
-            if music_info["username"] == username:
-                music_path = os.path.join(MUSIC_DATA_DIR, music_info["filename"])
-                if os.path.exists(music_path):
-                    os.remove(music_path)
-                if "cover_filename" in music_info and music_info["cover_filename"]:
-                    cover_path = os.path.join(COVER_DATA_DIR, music_info["cover_filename"])
-                    if os.path.exists(cover_path):
-                        os.remove(cover_path)
-                os.remove(info_path)
-                return True
-        except PermissionError:
-            print("没有足够的权限删除音乐。请检查运行环境的权限设置。")
+        with open(info_path, "r") as f:
+            music_info = json.load(f)
+        if music_info["username"] == username:
+            music_path = os.path.join(MUSIC_DATA_DIR, music_info["filename"])
+            if os.path.exists(music_path):
+                os.remove(music_path)
+            # 检查 cover_filename 键是否存在
+            if "cover_filename" in music_info and music_info["cover_filename"]:
+                cover_path = os.path.join(COVER_DATA_DIR, music_info["cover_filename"])
+                if os.path.exists(cover_path):
+                    os.remove(cover_path)
+            os.remove(info_path)
+            return True
     return False
-```
 
-#### 点赞音乐 👍
-已登录用户可以对音乐进行点赞操作。系统会更新音乐信息文件中的点赞数，就像你为一艘喜欢的船只升起了一面赞许的旗帜，让它更加引人注目。
-```python
-# music_manager.py
 def like_music(filename):
     info_filename = filename.rsplit('.', 1)[0] + '.json'
     info_path = os.path.join(MUSIC_DATA_DIR, info_filename)
     if os.path.exists(info_path):
-        try:
-            with open(info_path, "r") as f:
-                music_info = json.load(f)
-            music_info["likes"] += 1
-            with open(info_path, "w") as f:
-                json.dump(music_info, f)
-            return True
-        except PermissionError:
-            print("没有足够的权限更新音乐点赞信息。请检查运行环境的权限设置。")
+        with open(info_path, "r") as f:
+            music_info = json.load(f)
+        music_info["likes"] += 1
+        with open(info_path, "w") as f:
+            json.dump(music_info, f)
+        return True
     return False
 ```
 
-## 四、安装与运行 🚀
-
-### 安装依赖
-```bash
-pip install -r requirements.txt
-```
-
-### 运行项目
+## 五、运行步骤
+1. 确保你已经安装了 Python 和所需的库，如 Flask、Pillow 等。
+2. 克隆项目代码到本地。
+3. 修改 `user_manager.py` 中的 `USER_DATA_DIR` 和 `music_manager.py` 中的 `MUSIC_DATA_DIR`、`COVER_DATA_DIR` 为你本地的实际路径。
+4. 打开终端，进入项目目录。
+5. 运行以下命令启动应用程序：
 ```bash
 python app.py
 ```
+6. 打开浏览器，访问 `http://127.0.0.1:5000` 即可看到应用程序的首页😃。
 
-### 访问项目
-在浏览器中访问 `http://127.0.0.1:5000` 即可进入音乐分享平台，开启你的音乐之旅啦！🎉
+## 六、ngrok 内网穿透方法
 
-## 五、注意事项 ⚠️
-1. 确保运行环境具有足够的权限来创建和操作文件和目录，不然你的船只可能无法顺利停靠或离开港湾哦。
-2. 项目使用 JSON 文件存储数据，适用于小型应用。在生产环境中，建议使用数据库（如 MySQL、PostgreSQL）来存储数据，就像将小码头升级为大港口，更能容纳大量的船只。
-3. 项目的 `secret_key` 使用 `os.urandom(24)` 生成，在生产环境中应使用固定的安全密钥，就像为你的港湾设置一把更安全的锁。 
+### 1. 下载并安装 ngrok
+- 访问 [ngrok 官方网站](https://ngrok.com/) 注册账号并下载适合你操作系统的 ngrok 客户端。
+- 解压下载的文件到一个目录，例如 `C:\ngrok`。
 
-## 六、联系方式
-1. QQ：308328889（炽阳001）
-2. 联系时请注明原因
+### 2. 配置 ngrok
+- 打开终端，进入 ngrok 所在的目录，例如：
+```bash
+cd C:\ngrok
+```
+- 使用你的 ngrok 账号的认证令牌进行配置，命令如下：
+```bash
+ngrok authtoken your_auth_token
+```
+其中 `your_auth_token` 是你在 ngrok 官网获取的认证令牌。
+
+### 3. 启动内网穿透
+- 确保你的 Flask 应用程序已经在本地运行，默认端口是 5000。
+- 在终端中运行以下命令启动 ngrok 并将本地的 5000 端口映射到外网：
+```bash
+ngrok http 5000
+```
+- 运行成功后，ngrok 会生成一个外网访问地址，类似 `http://xxxxxx.ngrok.io` 和 `https://xxxxxx.ngrok.io`，你可以将这个地址分享给其他人，他们就可以通过这个地址访问你本地运行的应用程序了🎉。
+
+## 七、注意事项
+- 项目中使用的密码存储方式是明文存储，在实际生产环境中，建议使用加密算法对密码进行加密存储🔒。
+- 项目中使用的文件存储方式仅适用于小型项目，在实际生产环境中，建议使用数据库来存储用户信息和音乐信息。
+- 使用 ngrok 进行内网穿透时，免费版的 ngrok 会在每次启动时生成不同的外网访问地址，且有一定的访问限制。如果需要更稳定的服务，可以考虑使用付费版。
